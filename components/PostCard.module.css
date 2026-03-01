@@ -1,0 +1,226 @@
+.card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    isolation: isolate;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.linkIcon {
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.linkIcon:hover {
+    color: var(--text-primary);
+}
+
+.script {
+    position: relative;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-color);
+    font-style: italic;
+
+}
+
+.sectionTitle {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.assetBadge {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.badgeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.ticker {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+}
+
+.posturaText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+}
+
+/* Dynamic Modifiers for posture */
+.Alcista {
+    color: var(--bullish-color);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.Bajista {
+    color: var(--bearish-color);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.Neutral {
+    color: var(--text-secondary);
+    background: rgba(139, 139, 147, 0.1);
+}
+
+.targets {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+/* Audio Player Mock Styling */
+.audioPlayer {
+    margin-top: 1.5rem;
+    background: #000;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.playBtn {
+    background: var(--text-primary);
+    color: black;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.playBtn:hover {
+    transform: scale(1.05);
+}
+
+.waveform {
+    flex-grow: 1;
+    height: 24px;
+    background: repeating-linear-gradient(90deg,
+            var(--text-secondary) 0px,
+            var(--text-secondary) 2px,
+            transparent 2px,
+            transparent 6px);
+    opacity: 0.3;
+    border-radius: 12px;
+    transition: opacity 0.3s;
+}
+
+/* Extended Analysis Section */
+.extendedAnalysis {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px dashed var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.analysisBlock {
+    background: rgba(255, 255, 255, 0.015);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.analysisList {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+}
+
+.analysisList li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+}
+
+.analysisList li::before {
+    content: "»";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Sequential list for chart descriptions */
+.sequentialList {
+    list-style: decimal inside;
+    padding-left: 0;
+}
+
+.sequentialList li {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+}
+
+.sequentialList li::marker {
+    color: var(--accent-color);
+    font-weight: bold;
+}
