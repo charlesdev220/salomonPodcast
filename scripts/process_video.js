@@ -5,10 +5,21 @@ const fs = require('fs');
 
 const { appendRow } = require('./google_sheets');
 
-const CHANNEL_ID = 'UCiGMIk8oeayv91jjTgm-CIw';
+const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCiGMIk8oeayv91jjTgm-CIw';
 const RSS_FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 
 async function getLatestVideo() {
+    if (process.env.YOUTUBE_URL) {
+        console.log("🔍 Buscando en URL específica:", process.env.YOUTUBE_URL);
+        const response = await fetch(process.env.YOUTUBE_URL);
+        if (!response.ok) throw new Error("No se pudo obtener la página de YouTube.");
+        const text = await response.text();
+        const videoIdMatch = text.match(/"videoId":"([^"]+)"/);
+        const titleMatch = text.match(/"title":\{"runs":\[\{"text":"([^"]+)"\}\]/);
+        if (!videoIdMatch || !titleMatch) throw new Error("No se encontraron videos en la URL.");
+        return { videoId: videoIdMatch[1], title: titleMatch[1] };
+    }
+
     const response = await fetch(RSS_FEED_URL);
     if (!response.ok) throw new Error("No se pudo obtener el RSS de YouTube.");
     const text = await response.text();
@@ -60,7 +71,14 @@ async function main() {
 
         console.log("\n🧠 Analizando y generando el podcast / resumen con Schema estricto...");
         const prompt = `
-        Eres un asistente financiero de alto nivel. Analiza este podcast de YouTube de Alejandro Salomon (Emprendeduro) y extrae la información requerida de manera sumamente precisa y detallada. Escucha pacientemente para el Script final.
+        Eres un analista financiero experto escuchando el podcast de Alejandro Salomon (Emprendeduro).
+        Tu objetivo crítico es extraer información sumamente precisa de inversión, sin omitir ningún dato técnico.
+        ESPECÍFICAMENTE BUSCA:
+        1. Las apuestas exactas (long/short, opciones, el famoso "1%") de Alejandro Salomon.
+        2. La visión de mercado general: cómo ven la macro, las tasas, S&P 500 y Crypto de cara al futuro.
+        3. En qué activos van a invertir, cuáles ya vendieron, o en cuáles están atrapados (tickers específicos).
+        4. Las perspectivas y análisis de gráficos de sus compañeros (por ejemplo, Rodrigo), apuntando precios de resistencia, soporte y targets.
+        Extrae TODO con el máximo nivel de detalle posible en español.
         `;
 
         const responseSchema = {
@@ -68,37 +86,42 @@ async function main() {
             properties: {
                 script: {
                     type: Type.STRING,
-                    description: "Monólogo extenso estilo podcast para audio de IA, animado al estilo Salomon. ADEMÁS de la tesis principal, DEBES mencionar orgánicamente detallando todo en tu discurso conversacional SIN comillas dobles internas: 1) Los puntos claves, 2) Gráficos expuestos, 3) Temas críticos, y 4) Apuestas del 1%."
+                    description: "Monólogo resumido estilo podcast para audio de IA, animado al estilo Salomon. DEBES mencionar orgánicamente detallando todo en tu discurso conversacional, especialmente: 1) Visión del mercado, 2) Gráficos de compañeros, 3) Apuestas e inversiones puntuales de ambos."
+                },
+                vision_mercado: {
+                    type: Type.STRING,
+                    description: "Resumen muy elaborado de la visión actual del mercado, macroeconomía, crypto y sentimiento de inversión general (bullish/bearish) que tienen."
                 },
                 inversiones: {
                     type: Type.ARRAY,
                     items: {
                         type: Type.OBJECT,
                         properties: {
-                            ticker: { type: Type.STRING },
-                            postura: { type: Type.STRING },
-                            targets: { type: Type.STRING }
+                            inversor: { type: Type.STRING, description: "Quién menciona la inversión (Salomon, Rodrigo, etc.)" },
+                            ticker_o_activo: { type: Type.STRING, description: "Ej: BTC, SPY, Oro, Tesla" },
+                            postura: { type: Type.STRING, description: "Comprar, Vender, Mantener, Short, Long" },
+                            precios_y_targets: { type: Type.STRING, description: "Precios de entrada, stop loss, take profit mencionados" }
                         }
                     }
                 },
                 puntos_claves_salomon: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Puntos detallados antes de que entren los compañeros" }
+                    items: { type: Type.STRING, description: "Tesis principales, opiniones fuertes y predicciones personales de Alejandro Salomon." }
                 },
                 graficos_companeros: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Análisis extremadamente detallado de fechas, targets y narrativas" }
+                    items: { type: Type.STRING, description: "Detalle técnico de los gráficos compartidos por sus compañeros, mencionando niveles clave, soportes, resistencias y narrativas." }
                 },
                 temas_importantes: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING }
+                    items: { type: Type.STRING, description: "Noticias o temas de actualidad de relevancia discutidos." }
                 },
-                inversiones_1_porciento: {
+                apuestas_especificas: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING }
+                    items: { type: Type.STRING, description: "Las apuestas de alto riesgo, los trades del 1% o movimientos altamente especulativos comentados en el show." }
                 }
             },
-            required: ["script", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "inversiones_1_porciento"]
+            required: ["script", "vision_mercado", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "apuestas_especificas"]
         };
 
         const result = await ai.models.generateContent({
@@ -118,9 +141,10 @@ async function main() {
         const data = JSON.parse(jsonString);
 
         console.log("\n================ E X T R A C C I O N ================\n");
-        console.log("Guion del Podcast:", data.script);
-        console.log("Inversiones:", data.inversiones);
-        console.log("Puntos Claves:", data.puntos_claves_salomon);
+        console.log("Visión del Mercado:", data.vision_mercado);
+        console.log("Inversiones:", JSON.stringify(data.inversiones, null, 2));
+        console.log("Apuestas Específicas:", data.apuestas_especificas);
+        console.log("Gráficos Compañeros:", data.graficos_companeros);
         console.log("\n===========================================================");
 
         console.log('📝 Guardando resultados en Google Sheets...');
@@ -130,13 +154,14 @@ async function main() {
             hoy,
             videoId,
             title,
-            data.script,
+            data.script, // Ojo, esto usa el "script", asegúrate de si el user quiere el script o el resumen crudo, lo dejamos como script.
             JSON.stringify(data.inversiones),
             JSON.stringify({
+                vision_mercado: data.vision_mercado,
                 puntos_claves_salomon: data.puntos_claves_salomon,
                 graficos_companeros: data.graficos_companeros,
                 temas_importantes: data.temas_importantes,
-                inversiones_1_porciento: data.inversiones_1_porciento
+                apuestas_especificas: data.apuestas_especificas
             })
         ]);
 

@@ -90,4 +90,33 @@ if (require.main === module) {
     testConnection();
 }
 
-module.exports = { getAuthClient, appendRow };
+async function checkIfVideoExists(videoId) {
+    try {
+        const authClient = await getAuthClient();
+        const sheets = google.sheets({ version: 'v4', auth: authClient });
+        const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+
+        if (!spreadsheetId) {
+            throw new Error('Falta GOOGLE_SHEETS_ID en tu archivo .env');
+        }
+
+        const res = await sheets.spreadsheets.values.get({
+            spreadsheetId: spreadsheetId,
+            range: 'B:B', // Asumiendo que Video ID está en la columna B
+        });
+
+        const rows = res.data.values;
+        if (!rows || rows.length === 0) {
+            return false;
+        }
+
+        // rows es un array de arrays: [['Video ID'], ['12345'], ['67890']]
+        const exists = rows.some(row => row[0] === videoId);
+        return exists;
+    } catch (error) {
+        console.error('❌ Error verificando si el video existe:', error.message);
+        throw error;
+    }
+}
+
+module.exports = { getAuthClient, appendRow, checkIfVideoExists };

@@ -1,9 +1,9 @@
-name: Daily Salomon Podcast Processor
+name: Daily Salomon Podcast Processor 2
 
 on:
   schedule:
-    # Corre todos los días a las 02:00 AM UTC (Ajustable a cuando Salomon suele terminar sus directos)
-    - cron: '0 2 * * *'
+    # Corre todos los días a las 03:00 AM UTC
+    - cron: '0 3 * * *'
   workflow_dispatch: # Permite ejecución manual desde la interfaz de GitHub
 
 jobs:
@@ -25,6 +25,7 @@ jobs:
       - name: Check if Video Exists
         id: check_video
         env:
+          YOUTUBE_URL: "https://www.youtube.com/@AlejandroSalomonEmprendeduro/streams"
           GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
           GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
           GOOGLE_SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
@@ -54,6 +55,7 @@ jobs:
       - name: Run Processing Script
         if: steps.check_video.outputs.video_exists != 'true'
         env:
+          YOUTUBE_URL: "https://www.youtube.com/@AlejandroSalomonEmprendeduro/streams"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
           GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
