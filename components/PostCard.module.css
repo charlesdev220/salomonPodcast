@@ -224,3 +224,129 @@
     color: var(--accent-color);
     font-weight: bold;
 }
+
+/* Acordiones / Dropdowns */
+.accordion,
+.analysisAccordion {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.accordionSummary {
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+    list-style: none; /* Hide default triangle in some browsers */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.accordionSummary::-webkit-details-marker {
+    display: none;
+}
+
+.accordionSummary::after {
+    content: '+';
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    transition: transform 0.3s;
+}
+
+details[open] > .accordionSummary::after {
+    transform: rotate(45deg);
+}
+
+.accordionSummary:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.accordionContent {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+}
+
+/* Inversiones Graficas */
+.investmentsSection {
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.gridGraphical {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+}
+
+.assetCard {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.assetCard:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.assetIconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin-right: 1.25rem;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Herencia de colores de postura para el icono */
+.Alcista .assetIconWrapper {
+    color: var(--bullish-color, #10b981);
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.Bajista .assetIconWrapper {
+    color: var(--bearish-color, #ef4444);
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.Neutral .assetIconWrapper {
+    color: var(--text-secondary);
+    background: rgba(139, 139, 147, 0.15);
+}
+
+.assetInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.assetInfo .ticker {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.assetInfo .targets {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-top: 0.25rem;
+}

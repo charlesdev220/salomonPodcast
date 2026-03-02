@@ -89,9 +89,14 @@ export default function PostCard({ post }: { post: PostProps }) {
             </div>
 
             <div className={styles.script}>
-                <p>"{post.script}"</p>
+                <details className={styles.accordion}>
+                    <summary className={styles.accordionSummary}>Ver Resumen en Texto</summary>
+                    <div className={styles.accordionContent}>
+                        <p>"{post.script}"</p>
+                    </div>
+                </details>
 
-                {/* Audio Player */}
+                {/* Audio Player manteniéndose fuera del acordeón */}
                 <div className={styles.audioPlayer}>
                     <button
                         className={styles.playBtn}
@@ -99,19 +104,16 @@ export default function PostCard({ post }: { post: PostProps }) {
                         title={isPlaying ? "Pausar Podcast" : "Reproducir Podcast"}
                     >
                         {isPlaying ? (
-                            // Pause Icon
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="6" y="4" width="4" height="16"></rect>
                                 <rect x="14" y="4" width="4" height="16"></rect>
                             </svg>
                         ) : (
-                            // Play Icon
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
                             </svg>
                         )}
                     </button>
-                    {/* Visual waveform animated via CSS state if needed */}
                     <div className={styles.waveform} style={{ opacity: isPlaying ? 0.8 : 0.3 }}></div>
                     <span style={{ fontSize: '0.75rem', color: isPlaying ? 'var(--accent-color)' : 'var(--text-secondary)' }}>
                         {isPlaying ? 'Reproduciendo...' : 'Voz de IA Integrada'}
@@ -120,23 +122,45 @@ export default function PostCard({ post }: { post: PostProps }) {
             </div>
 
             {post.inversiones && post.inversiones.length > 0 && (
-                <div>
+                <div className={styles.investmentsSection}>
                     <h3 className={styles.sectionTitle}>Inversiones Extraídas</h3>
-                    <div className={styles.grid}>
+                    <div className={styles.gridGraphical}>
                         {post.inversiones.map((inv, idx) => {
                             let postureClass = styles.Neutral;
-                            if (inv.postura.toLowerCase().includes('alcista')) postureClass = styles.Alcista;
-                            else if (inv.postura.toLowerCase().includes('bajista')) postureClass = styles.Bajista;
+                            let icon = (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            );
+
+                            if (inv.postura.toLowerCase().includes('alcista')) {
+                                postureClass = styles.Alcista;
+                                icon = (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                                        <polyline points="16 7 22 7 22 13"></polyline>
+                                    </svg>
+                                );
+                            } else if (inv.postura.toLowerCase().includes('bajista')) {
+                                postureClass = styles.Bajista;
+                                icon = (
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline>
+                                        <polyline points="16 17 22 17 22 11"></polyline>
+                                    </svg>
+                                );
+                            }
 
                             return (
-                                <div key={idx} className={styles.assetBadge}>
-                                    <div className={styles.badgeHeader}>
-                                        <span className={styles.ticker}>{inv.ticker}</span>
-                                        <span className={`${styles.posturaText} ${postureClass}`}>
-                                            {inv.postura}
-                                        </span>
+                                <div key={idx} className={`${styles.assetCard} ${postureClass}`}>
+                                    <div className={styles.assetIconWrapper}>
+                                        {icon}
                                     </div>
-                                    <p className={styles.targets}>{inv.targets}</p>
+                                    <div className={styles.assetInfo}>
+                                        <span className={styles.ticker}>{inv.ticker}</span>
+                                        <span className={styles.posturaText}>{inv.postura}</span>
+                                        <p className={styles.targets}>{inv.targets}</p>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -147,48 +171,55 @@ export default function PostCard({ post }: { post: PostProps }) {
             {post.analisisDetallado && (
                 <div className={styles.extendedAnalysis}>
                     {post.analisisDetallado.puntos_claves_salomon && post.analisisDetallado.puntos_claves_salomon.length > 0 && (
-                        <div className={styles.analysisBlock}>
-                            <h3 className={styles.sectionTitle}>Puntos Claves (Alejandro Salomon)</h3>
-                            <ul className={styles.analysisList}>
-                                {post.analisisDetallado.puntos_claves_salomon.map((item, i) => (
-                                    <li key={i}>{item}</li>
-                                ))}
-                            </ul>
-                        </div>
+                        <details className={styles.analysisAccordion}>
+                            <summary className={styles.accordionSummary}>Puntos Claves (Alejandro Salomon)</summary>
+                            <div className={styles.accordionContent}>
+                                <ul className={styles.analysisList}>
+                                    {post.analisisDetallado.puntos_claves_salomon.map((item, i) => (
+                                        <li key={i}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </details>
                     )}
 
                     {post.analisisDetallado.graficos_companeros && post.analisisDetallado.graficos_companeros.length > 0 && (
-                        <div className={styles.analysisBlock}>
-                            <h3 className={styles.sectionTitle}>Análisis de Gráficos Secuenciales</h3>
-                            <ol className={styles.sequentialList}>
-                                {post.analisisDetallado.graficos_companeros.map((item, i) => (
-                                    // Limpiamos los numeros iniciales generados por la LLM si existen (e.j "1. Grafico X")
-                                    <li key={i}>{item.replace(/^\d+\.\s*/, '')}</li>
-                                ))}
-                            </ol>
-                        </div>
+                        <details className={styles.analysisAccordion}>
+                            <summary className={styles.accordionSummary}>Análisis de Gráficos Secuenciales</summary>
+                            <div className={styles.accordionContent}>
+                                <ol className={styles.sequentialList}>
+                                    {post.analisisDetallado.graficos_companeros.map((item, i) => (
+                                        <li key={i}>{item.replace(/^\d+\.\s*/, '')}</li>
+                                    ))}
+                                </ol>
+                            </div>
+                        </details>
                     )}
 
                     {post.analisisDetallado.temas_importantes && post.analisisDetallado.temas_importantes.length > 0 && (
-                        <div className={styles.analysisBlock}>
-                            <h3 className={styles.sectionTitle}>Temas Importantes de la Sesión</h3>
-                            <ul className={styles.analysisList}>
-                                {post.analisisDetallado.temas_importantes.map((item, i) => (
-                                    <li key={i}>{item}</li>
-                                ))}
-                            </ul>
-                        </div>
+                        <details className={styles.analysisAccordion}>
+                            <summary className={styles.accordionSummary}>Temas Importantes de la Sesión</summary>
+                            <div className={styles.accordionContent}>
+                                <ul className={styles.analysisList}>
+                                    {post.analisisDetallado.temas_importantes.map((item, i) => (
+                                        <li key={i}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </details>
                     )}
 
                     {post.analisisDetallado.inversiones_1_porciento && post.analisisDetallado.inversiones_1_porciento.length > 0 && (
-                        <div className={styles.analysisBlock}>
-                            <h3 className={styles.sectionTitle}>Apuestas Salomundo (La cartera del 1%)</h3>
-                            <ul className={styles.analysisList}>
-                                {post.analisisDetallado.inversiones_1_porciento.map((item, i) => (
-                                    <li key={i}>{item}</li>
-                                ))}
-                            </ul>
-                        </div>
+                        <details className={styles.analysisAccordion}>
+                            <summary className={styles.accordionSummary}>Apuestas Salomundo (La cartera del 1%)</summary>
+                            <div className={styles.accordionContent}>
+                                <ul className={styles.analysisList}>
+                                    {post.analisisDetallado.inversiones_1_porciento.map((item, i) => (
+                                        <li key={i}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </details>
                     )}
                 </div>
             )}
