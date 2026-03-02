@@ -33,7 +33,8 @@ async function main() {
         const audioFile = `${videoId}.mp3`;
 
         console.log("⬇️  Descargando el audio usando yt-dlp...");
-        execSync(`yt-dlp -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        const cookiesArg = fs.existsSync('cookies.txt') ? '--cookies cookies.txt' : '';
+        execSync(`yt-dlp --js-runtimes node ${cookiesArg} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
 
         if (!fs.existsSync(audioFile)) {
             throw new Error(`El archivo de audio ${audioFile} no se generó.`);

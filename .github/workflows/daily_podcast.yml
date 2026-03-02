@@ -32,6 +32,14 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
+      - name: Setup YouTube Cookies
+        env:
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        run: |
+          if [ -n "$YOUTUBE_COOKIES" ]; then
+            echo "$YOUTUBE_COOKIES" | base64 -d > cookies.txt
+          fi
+
       - name: Run Processing Script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
