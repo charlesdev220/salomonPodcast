@@ -1,9 +1,6 @@
 name: Daily Salomon Podcast Processor 2
 
 on:
-  schedule:
-    # Corre todos los días a las 03:00 AM UTC
-    - cron: '0 3 * * *'
   workflow_dispatch: # Permite ejecución manual desde la interfaz de GitHub
 
 jobs:
