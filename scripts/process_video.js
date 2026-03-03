@@ -45,10 +45,20 @@ async function main() {
 
         console.log("⬇️  Descargando el audio usando yt-dlp (max 40 min)...");
         const cookiesArg = fs.existsSync('cookies.txt') ? '--cookies cookies.txt' : '';
-        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --download-sections "*00:00:00-00:40:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --no-playlist --download-sections "*00:00:00-00:25:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
 
         if (!fs.existsSync(audioFile)) {
             throw new Error(`El archivo de audio ${audioFile} no se generó.`);
+        }
+
+        const stats = fs.statSync(audioFile);
+        const fileSizeInMB = stats.size / (1024 * 1024);
+        console.log(`📦 Tamaño del archivo generado: ${fileSizeInMB.toFixed(2)} MB`);
+
+        // Un audio de 40 minutos equivale típicamente a 35-45 MB (a 128-160 kbps).
+        const maxMB = 50;
+        if (fileSizeInMB > maxMB) {
+            throw new Error(`El archivo descargado es demasiado grande (${fileSizeInMB.toFixed(2)} MB). Supera el límite de ${maxMB} MB (equivalente a 40 min).`);
         }
 
         console.log("🚀 Subiendo audio a Gemini...");
