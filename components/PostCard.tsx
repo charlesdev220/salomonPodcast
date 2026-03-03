@@ -4,9 +4,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './PostCard.module.css';
 
 interface Inversion {
-    ticker: string;
-    postura: 'Alcista' | 'Bajista' | 'Neutral' | string;
-    targets: string;
+    ticker?: string;
+    ticker_o_activo?: string;
+    postura: string;
+    targets?: string;
+    precios_y_targets?: string;
+    inversor?: string;
 }
 
 export interface PostProps {
@@ -153,13 +156,23 @@ export default function PostCard({ post }: { post: PostProps }) {
 
                             return (
                                 <div key={idx} className={`${styles.assetCard} ${postureClass}`}>
-                                    <div className={styles.assetIconWrapper}>
-                                        {icon}
+                                    <div className={styles.assetHeader}>
+                                        <div className={styles.tickerHeader}>
+                                            <div className={styles.assetIconWrapper}>
+                                                {icon}
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                <span className={styles.ticker}>{inv.ticker_o_activo || inv.ticker || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                        <span className={styles.posturaText}>{inv.postura}</span>
                                     </div>
                                     <div className={styles.assetInfo}>
-                                        <span className={styles.ticker}>{inv.ticker}</span>
-                                        <span className={styles.posturaText}>{inv.postura}</span>
-                                        <p className={styles.targets}>{inv.targets}</p>
+                                        <div className={styles.investorBadge}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            {inv.inversor || 'Salomon'}
+                                        </div>
+                                        <p className={styles.targets}>{inv.precios_y_targets || inv.targets || 'Sin detalles'}</p>
                                     </div>
                                 </div>
                             );
