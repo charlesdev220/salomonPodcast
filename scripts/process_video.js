@@ -88,7 +88,7 @@ async function main() {
         2. La visión de mercado general: cómo ven la macro, las tasas, S&P 500 y Crypto de cara al futuro.
         3. En qué activos van a invertir, cuáles ya vendieron, o en cuáles están atrapados (tickers específicos).
         4. Las perspectivas y análisis de gráficos de sus compañeros (por ejemplo, Rodrigo), apuntando precios de resistencia, soporte y targets.
-        Extrae TODO con el máximo nivel de detalle posible en español.
+        Extrae TODO con el máximo nivel de detalle posible en español. EL MONÓLOGO (SCRIPT) DEBE TENER UN MÁXIMO DE 600 PALABRAS.
         `;
 
         const responseSchema = {
@@ -96,7 +96,7 @@ async function main() {
             properties: {
                 script: {
                     type: Type.STRING,
-                    description: "Monólogo resumido estilo podcast para audio de IA, animado al estilo Salomon. DEBES mencionar orgánicamente detallando todo en tu discurso conversacional, especialmente: 1) Visión del mercado, 2) Gráficos de compañeros, 3) Apuestas e inversiones puntuales de ambos."
+                    description: "Monólogo corto estilo podcast para audio de IA (MÁXIMO 600 PALABRAS), animado al estilo Salomon. DEBES mencionar orgánicamente detallando todo en tu discurso conversacional, especialmente: 1) Visión del mercado, 2) Gráficos de compañeros, 3) Apuestas e inversiones puntuales de ambos."
                 },
                 vision_mercado: {
                     type: Type.STRING,
