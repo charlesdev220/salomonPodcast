@@ -43,9 +43,16 @@ async function main() {
 
         const audioFile = `${videoId}.mp3`;
 
-        console.log("⬇️  Descargando el audio usando yt-dlp (max 40 min)...");
+        console.log("⬇️  Descargando el audio completo usando yt-dlp...");
         const cookiesArg = fs.existsSync('cookies.txt') ? '--cookies cookies.txt' : '';
-        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --extractor-args "youtube:player_client=ios,android,web" --no-playlist --download-sections "*00:00:00-00:25:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --extractor-args "youtube:player_client=ios,android,web" --no-playlist -x --audio-format mp3 -o "full_${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+
+        console.log("✂️  Recortando los primeros 35 minutos del audio...");
+        execSync(`ffmpeg -i "full_${audioFile}" -t 00:35:00 -c copy "${audioFile}"`, { stdio: 'inherit' });
+
+        if (fs.existsSync(`full_${audioFile}`)) {
+            fs.unlinkSync(`full_${audioFile}`);
+        }
 
         if (!fs.existsSync(audioFile)) {
             throw new Error(`El archivo de audio ${audioFile} no se generó.`);
