@@ -9,6 +9,11 @@ const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || 'UCiGMIk8oeayv91jjTgm-CIw';
 const RSS_FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
 
 async function getLatestVideo() {
+    if (process.env.TARGET_VIDEO_ID && process.env.TARGET_VIDEO_TITLE) {
+        console.log("🎯 Usando video específico proporcionado por variables de entorno.");
+        return { videoId: process.env.TARGET_VIDEO_ID, title: process.env.TARGET_VIDEO_TITLE };
+    }
+
     if (process.env.YOUTUBE_URL) {
         console.log("🔍 Buscando en URL específica:", process.env.YOUTUBE_URL);
         const response = await fetch(process.env.YOUTUBE_URL);
