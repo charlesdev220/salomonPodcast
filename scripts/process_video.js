@@ -49,10 +49,10 @@ async function main() {
 
         try {
             console.log("Intentando descargar (intento 1)...");
-            execSync(`yt-dlp --js-runtimes node ${cookiesArg} ${extractorArgs} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+            execSync(`yt-dlp --js-runtimes node ${cookiesArg} ${extractorArgs} -x --audio-format mp3 -o "full_${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
         } catch (e) {
             console.log("⚠️ Falló con las cookies dadas. Las cookies pueden estar oxidadas/ilegibles. Intentando sin cookies...");
-            execSync(`yt-dlp --js-runtimes node ${extractorArgs} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+            execSync(`yt-dlp --js-runtimes node ${extractorArgs} -x --audio-format mp3 -o "full_${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
         }
 
         console.log("✂️  Recortando los primeros 35 minutos del audio...");
