@@ -45,7 +45,7 @@ async function main() {
 
         console.log("⬇️  Descargando el audio usando yt-dlp (max 40 min)...");
         const cookiesArg = fs.existsSync('cookies.txt') ? '--cookies cookies.txt' : '';
-        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --no-playlist --download-sections "*00:00:00-00:25:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        execSync(`yt-dlp --js-runtimes node ${cookiesArg} --extractor-args "youtube:player_client=ios,android,web" --no-playlist --download-sections "*00:00:00-00:25:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
 
         if (!fs.existsSync(audioFile)) {
             throw new Error(`El archivo de audio ${audioFile} no se generó.`);
