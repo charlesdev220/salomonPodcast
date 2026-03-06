@@ -45,9 +45,15 @@ async function main() {
 
         console.log("⬇️  Descargando el audio completo usando yt-dlp...");
         const cookiesArg = fs.existsSync('cookies.txt') ? '--cookies cookies.txt' : '';
-        //execSync(`yt-dlp --js-runtimes node ${cookiesArg} --extractor-args "youtube:player_client=ios,android,web" --no-playlist -x --audio-format mp3 -o "full_${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
-        //execSync(`yt-dlp --js-runtimes node ${cookiesArg} --download-sections "*00:00:00-00:40:00" -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
-        execSync(`yt-dlp --js-runtimes node ${cookiesArg} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        const extractorArgs = '--extractor-args "youtube:player_client=ios,android,web"';
+
+        try {
+            console.log("Intentando descargar (intento 1)...");
+            execSync(`yt-dlp --js-runtimes node ${cookiesArg} ${extractorArgs} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        } catch (e) {
+            console.log("⚠️ Falló con las cookies dadas. Las cookies pueden estar oxidadas/ilegibles. Intentando sin cookies...");
+            execSync(`yt-dlp --js-runtimes node ${extractorArgs} -x --audio-format mp3 -o "${audioFile}" "https://www.youtube.com/watch?v=${videoId}"`, { stdio: 'inherit' });
+        }
 
         console.log("✂️  Recortando los primeros 35 minutos del audio...");
         execSync(`ffmpeg -i "full_${audioFile}" -t 00:35:00 -c copy "${audioFile}"`, { stdio: 'inherit' });
