@@ -47,7 +47,6 @@ async function main() {
         const { videoId, title } = await getLatestVideo();
         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
         console.log(`🎯 Video encontrado: ${title} (${videoUrl})`);
-
         console.log("🛡️ Verificando si el video ya existe en el Excel...");
         const exists = await checkIfVideoExists(videoId);
         if (exists) {
@@ -56,7 +55,7 @@ async function main() {
         }
 
         console.log("➕ Añadiendo video como fuente en NotebookLM...");
-        const addResult = await client.callTool({
+        await client.callTool({
             name: "notebook_add_url",
             arguments: {
                 notebook_id: NOTEBOOK_ID,
@@ -65,8 +64,33 @@ async function main() {
         });
 
         console.log("⏳ Esperando un momento para que NotebookLM procese la fuente...");
-        // NotebookLM suele ser rápido con YouTube, pero daremos 10 segundos
         await new Promise(resolve => setTimeout(resolve, 10000));
+
+        console.log("🔍 Identificando el ID de la fuente para aislar el análisis...");
+        const describeResult = await client.callTool({
+            name: "notebook_describe",
+            arguments: { notebook_id: NOTEBOOK_ID }
+        });
+
+        let sourceIds = null;
+        try {
+            const notebookInfo = JSON.parse(describeResult.content[0].text);
+            const sources = notebookInfo.sources || [];
+            // Buscamos la fuente que coincida con el video o el título
+            const currentSource = sources.find(s =>
+                (s.source_url && s.source_url.includes(videoId)) ||
+                (s.title && s.title.includes(title))
+            );
+
+            if (currentSource) {
+                console.log(`🎯 Fuente fijada: ${currentSource.title} (ID: ${currentSource.source_id})`);
+                sourceIds = [currentSource.source_id];
+            } else {
+                console.log("⚠️ No se encontró el ID de la fuente específica. Se usará el contexto global.");
+            }
+        } catch (e) {
+            console.log("⚠️ No se pudo filtrar las fuentes. Procediendo con el cuaderno completo.");
+        }
 
         const prompt = `
         Eres Alejandro Salomon (Emprendeduro). Analiza el video fuente "${title}" y genera un JSON con la siguiente estructura exacta.
@@ -93,12 +117,13 @@ async function main() {
         }
         `;
 
-        console.log("🧠 Consultando a NotebookLM...");
+        console.log("🧠 Consultando a NotebookLM (Análisis aislado)...");
         const queryResult = await client.callTool({
             name: "notebook_query",
             arguments: {
                 notebook_id: NOTEBOOK_ID,
-                query: prompt
+                query: prompt,
+                source_ids: sourceIds
             }
         });
 
