@@ -108,12 +108,21 @@ async function main() {
         2. La visión de mercado general: cómo ven la macro, las tasas, S&P 500 y Crypto de cara al futuro.
         3. En qué activos van a invertir, cuáles ya vendieron, o en cuáles están atrapados (tickers específicos).
         4. Las perspectivas y análisis de gráficos de sus compañeros (por ejemplo, Rodrigo), apuntando precios de resistencia, soporte y targets.
-        Extrae TODO con el máximo nivel de detalle posible en español. EL MONÓLOGO (SCRIPT) DEBE TENER UN MÁXIMO DE 600 PALABRAS.
+
+        Debes generar dos contenidos principales diferenciados:
+        1. RESUMEN EJECUTIVO: Un resumen detallado y estructurado de todos los hechos, noticias y movimientos discutidos, centrado en datos.
+        2. MONÓLOGO (SCRIPT): Un guion estilo podcast (MÁXIMO 600 PALABRAS), animado al estilo Salomon, para ser leído por una IA.
+
+        Extrae TODO con el máximo nivel de detalle posible en español.
         `;
 
         const responseSchema = {
             type: Type.OBJECT,
             properties: {
+                resumen_ejecutivo: {
+                    type: Type.STRING,
+                    description: "Resumen ejecutivo y detallado de los puntos más importantes tratados en el video, con un enfoque en hechos, datos, noticias y decisiones de inversión."
+                },
                 script: {
                     type: Type.STRING,
                     description: "Monólogo corto estilo podcast para audio de IA (MÁXIMO 600 PALABRAS), animado al estilo Salomon. DEBES mencionar orgánicamente detallando todo en tu discurso conversacional, especialmente: 1) Visión del mercado, 2) Gráficos de compañeros, 3) Apuestas e inversiones puntuales de ambos."
@@ -151,7 +160,7 @@ async function main() {
                     items: { type: Type.STRING, description: "Las apuestas de alto riesgo, los trades del 1% o movimientos altamente especulativos comentados en el show." }
                 }
             },
-            required: ["script", "vision_mercado", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "apuestas_especificas"]
+            required: ["resumen_ejecutivo", "script", "vision_mercado", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "apuestas_especificas"]
         };
 
         const result = await ai.models.generateContent({
@@ -171,10 +180,10 @@ async function main() {
         const data = JSON.parse(jsonString);
 
         console.log("\n================ E X T R A C C I O N ================\n");
+        console.log("Resumen Ejecutivo:", data.resumen_ejecutivo);
         console.log("Visión del Mercado:", data.vision_mercado);
         console.log("Inversiones:", JSON.stringify(data.inversiones, null, 2));
         console.log("Apuestas Específicas:", data.apuestas_especificas);
-        console.log("Gráficos Compañeros:", data.graficos_companeros);
         console.log("\n===========================================================");
 
         console.log('📝 Guardando resultados en Google Sheets...');
@@ -184,9 +193,10 @@ async function main() {
             hoy,
             videoId,
             title,
-            data.script, // Ojo, esto usa el "script", asegúrate de si el user quiere el script o el resumen crudo, lo dejamos como script.
+            data.resumen_ejecutivo, // Ahora usamos el resumen ejecutivo aquí
             JSON.stringify(data.inversiones),
             JSON.stringify({
+                script_podcast: data.script,
                 vision_mercado: data.vision_mercado,
                 puntos_claves_salomon: data.puntos_claves_salomon,
                 graficos_companeros: data.graficos_companeros,
