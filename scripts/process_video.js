@@ -96,57 +96,75 @@ async function main() {
 
         console.log("\n🧠 Analizando y generando el podcast / resumen con Schema estricto...");
         const prompt = `
-        Eres un analista financiero experto escuchando el podcast de Alejandro Salomon (Emprendeduro).
-        Tu objetivo crítico es extraer información sumamente precisa de inversión, sin omitir ningún dato técnico.
-        ESPECÍFICAMENTE BUSCA:
-        1. Las apuestas exactas (long/short, opciones, el famoso "1%") de Alejandro Salomon.
-        2. La visión de mercado general: cómo ven la macro, las tasas, S&P 500 y Crypto de cara al futuro.
-        3. En qué activos van a invertir, cuáles ya vendieron, o en cuáles están atrapados (tickers específicos).
-        4. Las perspectivas y análisis de gráficos de sus compañeros (por ejemplo, Rodrigo), apuntando precios de resistencia, soporte y targets.
-        Extrae TODO con el máximo nivel de detalle posible en español. EL MONÓLOGO (SCRIPT) DEBE TENER UN MÁXIMO DE 600 PALABRAS.
-        `;
+        Eres Alejandro Salomon (Emprendeduro). Analiza el video fuente "${title}" y genera un JSON con la siguiente estructura exacta.
+        IMPORTANTE: Devuelve ÚNICAMENTE el código JSON, sin textos explicativos ni markdown.
+
+        TONO Y ESTILO (OBLIGATORIO):
+        El campo "resumen_ejecutivo" debe ser un monólogo en primera persona, MADRO, ENERGÉTICO y FILOSÓFICO.
+        - Usa muletillas y frases típicas: "¡Qué onda, emprendeduros!", "Nadie me preguntó", "chango de tu existencia", "cabrones", "güeyes", "esto es un juego", "surfeando la ola del tiempo", "universo-pecera".
+        - Mezcla la sabiduría financiera con su visión de la realidad preescrita y la meditación.
+        - Utiliza el ejemplo que te doy como estándar de calidad y tono: "¡Qué onda, emprendeduros! Bienvenidos a 'Nadie me preguntó'. Hoy vamos a platicar de una realidad que les va a volar la cabeza... Olvídate de la ansiedad y las depresiones, esto es un juego... simplemente estamos surfeando la ola de tiempo..."
+
+        Estructura JSON:
+        {
+          "resumen_ejecutivo": "Monólogo extenso (MÁXIMO 800 PALABRAS) que sea el guion principal del podcast con la voz de Salomon, integrando las noticias del vídeo con su filosofía personal.",
+          "script": "Versión corta y resumida (MÁXIMO 200 PALABRAS) centrada solo en los puntos de acción más urgentes.",
+          "vision_mercado": "Resumen técnico de la visión macro, crypto y sentimiento de inversión.",
+          "inversiones": [
+            { "inversor": "Quién menciona la inversión", "ticker_o_activo": "Activo", "postura": "Buy/Sell/Short...", "precios_y_targets": "Niveles mencionados" }
+          ],
+          "puntos_claves_salomon": ["Opiniones fuertes y predicciones personales de Salomon"],
+          "graficos_companeros": ["Detalle técnico de los gráficos de Rodrigo/Farhan"],
+          "temas_importantes": ["Noticias clave discutidas"],
+          "apuestas_especificas": ["Movimientos del 1% o trades de alto riesgo"]
+        }`;
 
         const responseSchema = {
             type: Type.OBJECT,
             properties: {
+                resumen_ejecutivo: {
+                    type: Type.STRING,
+                    description: "Monólogo extenso (MÁXIMO 800 PALABRAS) que sea el guion principal del podcast con la voz de Salomon, integrando las noticias del vídeo con su filosofía personal."
+                },
                 script: {
                     type: Type.STRING,
-                    description: "Monólogo corto estilo podcast para audio de IA (MÁXIMO 600 PALABRAS), animado al estilo Salomon. DEBES mencionar orgánicamente detallando todo en tu discurso conversacional, especialmente: 1) Visión del mercado, 2) Gráficos de compañeros, 3) Apuestas e inversiones puntuales de ambos."
+                    description: "Versión corta y resumida (MÁXIMO 200 PALABRAS) centrada solo en los puntos de acción más urgentes."
                 },
                 vision_mercado: {
                     type: Type.STRING,
-                    description: "Resumen muy elaborado de la visión actual del mercado, macroeconomía, crypto y sentimiento de inversión general (bullish/bearish) que tienen."
+                    description: "Resumen técnico de la visión macro, crypto y sentimiento de inversión."
                 },
                 inversiones: {
                     type: Type.ARRAY,
                     items: {
                         type: Type.OBJECT,
                         properties: {
-                            inversor: { type: Type.STRING, description: "Quién menciona la inversión (Salomon, Rodrigo, etc.)" },
-                            ticker_o_activo: { type: Type.STRING, description: "Ej: BTC, SPY, Oro, Tesla" },
-                            postura: { type: Type.STRING, description: "Comprar, Vender, Mantener, Short, Long" },
-                            precios_y_targets: { type: Type.STRING, description: "Precios de entrada, stop loss, take profit mencionados" }
-                        }
+                            inversor: { type: Type.STRING, description: "Quién menciona la inversión" },
+                            ticker_o_activo: { type: Type.STRING, description: "Activo" },
+                            postura: { type: Type.STRING, description: "Buy/Sell/Short..." },
+                            precios_y_targets: { type: Type.STRING, description: "Niveles mencionados" }
+                        },
+                        required: ["inversor", "ticker_o_activo", "postura", "precios_y_targets"]
                     }
                 },
                 puntos_claves_salomon: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Tesis principales, opiniones fuertes y predicciones personales de Alejandro Salomon." }
+                    items: { type: Type.STRING, description: "Opiniones fuertes y predicciones personales de Salomon" }
                 },
                 graficos_companeros: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Detalle técnico de los gráficos compartidos por sus compañeros, mencionando niveles clave, soportes, resistencias y narrativas." }
+                    items: { type: Type.STRING, description: "Detalle técnico de los gráficos de Rodrigo/Farhan" }
                 },
                 temas_importantes: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Noticias o temas de actualidad de relevancia discutidos." }
+                    items: { type: Type.STRING, description: "Noticias clave discutidas" }
                 },
                 apuestas_especificas: {
                     type: Type.ARRAY,
-                    items: { type: Type.STRING, description: "Las apuestas de alto riesgo, los trades del 1% o movimientos altamente especulativos comentados en el show." }
+                    items: { type: Type.STRING, description: "Movimientos del 1% o trades de alto riesgo" }
                 }
             },
-            required: ["script", "vision_mercado", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "apuestas_especificas"]
+            required: ["resumen_ejecutivo", "script", "vision_mercado", "inversiones", "puntos_claves_salomon", "graficos_companeros", "temas_importantes", "apuestas_especificas"]
         };
 
         const result = await ai.models.generateContent({
@@ -166,6 +184,8 @@ async function main() {
         const data = JSON.parse(jsonString);
 
         console.log("\n================ E X T R A C C I O N ================\n");
+        console.log("Resumen Ejecutivo:", data.resumen_ejecutivo);
+        console.log("Script Corto:", data.script);
         console.log("Visión del Mercado:", data.vision_mercado);
         console.log("Inversiones:", JSON.stringify(data.inversiones, null, 2));
         console.log("Apuestas Específicas:", data.apuestas_especificas);
@@ -179,9 +199,10 @@ async function main() {
             hoy,
             videoId,
             title,
-            data.script, // Ojo, esto usa el "script", asegúrate de si el user quiere el script o el resumen crudo, lo dejamos como script.
+            data.resumen_ejecutivo,
             JSON.stringify(data.inversiones),
             JSON.stringify({
+                script: data.script,
                 vision_mercado: data.vision_mercado,
                 puntos_claves_salomon: data.puntos_claves_salomon,
                 graficos_companeros: data.graficos_companeros,
